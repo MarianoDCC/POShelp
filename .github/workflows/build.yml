@@ -1,7 +1,9 @@
 name: Build installer
 
-# Builds the Windows installer from source on every push and tag.
-# The artifact this produces is what gets code-signed for releases.
+# Builds the Windows installer from source on every push, and publishes it as a
+# release asset so there is always a plain download link — no GitHub account, no
+# digging through the Actions UI. This is the artifact that gets code-signed
+# once signing is in place.
 
 on:
   push:
@@ -9,6 +11,9 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   test:
@@ -30,10 +35,45 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+
+      - name: Read version from package.json
+        id: pkg
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
       - name: Build NSIS installer
         run: npm run dist:win
+
+      # Stable filename. electron-builder names it after the product and version
+      # ("TuResto Impresión Setup 3.7.0.exe") — a space and an accent in a URL,
+      # and it changes every release, so nothing can link to it permanently.
+      - name: Normalise the installer filename
+        shell: bash
+        run: |
+          mkdir -p out
+          cp "$(ls dist/*.exe | head -1)" "out/TuResto-Agente-Setup.exe"
+          ls -la out
+
       - uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: dist/*.exe
+          path: out/TuResto-Agente-Setup.exe
           if-no-files-found: error
+
+      # Published on pushes to main so the latest build is always downloadable
+      # at a fixed URL:
+      #   https://github.com/OWNER/REPO/releases/latest/download/TuResto-Agente-Setup.exe
+      - name: Publish release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.pkg.outputs.version }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" out/TuResto-Agente-Setup.exe --clobber
+          else
+            gh release create "$TAG" out/TuResto-Agente-Setup.exe \
+              --title "$TAG" \
+              --notes "Built from ${{ github.sha }} by GitHub Actions."
+          fi

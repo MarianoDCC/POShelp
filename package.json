@@ -8,8 +8,8 @@
     "start": "electron .",
     "test": "node test/clave.test.cjs",
     "dev": "cross-env NODE_ENV=development electron . --dev",
-    "dist:win": "electron-builder --win",
-    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -41,7 +41,7 @@
     ],
     "extraResources": [
       {
-        "from": "../print-extension",
+        "from": "extension",
         "to": "extension",
         "filter": [
           "**/*",

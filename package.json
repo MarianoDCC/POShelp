@@ -1,6 +1,6 @@
 {
   "name": "turesto-agente-impresion",
-  "version": "3.6.3",
+  "version": "3.7.0",
   "description": "Local print agent: lets a web app print receipts and kitchen tickets to any printer installed on the machine, without the browser print dialog.",
   "author": "TuResto",
   "main": "main.js",

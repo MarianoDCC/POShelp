@@ -1,0 +1,95 @@
+{
+  "name": "turesto-agente-impresion",
+  "version": "3.6.3",
+  "description": "Local print agent: lets a web app print receipts and kitchen tickets to any printer installed on the machine, without the browser print dialog.",
+  "author": "TuResto",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/clave.test.cjs",
+    "dev": "cross-env NODE_ENV=development electron . --dev",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "electron-log": "^5.1.2",
+    "electron-store": "^8.2.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "build": {
+    "appId": "com.turesto.printagent",
+    "productName": "TuResto Impresión",
+    "copyright": "Copyright © 2026 TuResto",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "lib/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../print-extension",
+        "to": "extension",
+        "filter": [
+          "**/*",
+          "!README.md"
+        ]
+      }
+    ],
+    "protocols": {
+      "name": "TuResto Protocol",
+      "schemes": [
+        "turesto"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "signingHashAlgorithms": [
+        "sha256"
+      ]
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.png",
+      "category": "public.app-category.business",
+      "hardenedRuntime": true,
+      "extendInfo": {
+        "LSUIElement": true
+      }
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TuResto Impresión",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": true,
+      "include": "build/installer.nsh"
+    }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/MarianoDCC/turesto-print-agent",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarianoDCC/turesto-print-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MarianoDCC/turesto-print-agent/issues"
+  }
+}

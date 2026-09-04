@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "TuResto Impresión",
+  "version": "2.1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiT3phAtHmeGs6pF6unrtTeVMD77hdYA0o5+a9L1KR+J6LgXQ2CYqnE3gPcWx8ybEGgJxPJbnJyy+9KfG63SguHZir/G4MvMamEsYmTT6Um62jMqd6AVc+HukcsT3USmN3BnXjXBPWngpqh939svOqPPhUYsOBUmMD8/gEyZ5+V71aGWrp9vRygLpkYyzAUimEo1wArEFfJf5niDDmMwot4+IzReBWeo4EoxE/EXjx7IW3DW33hOj3ePRpKV/DWTwVVk4TS8mLCdcM+78JmGFQLRi7sMNut7GBTzNtTcHxxLbGQ9R25kZBgfekt3mwZMZLTT85Ov8Vs9dewTMB8ENYwIDAQAB",
+  "description": "Conecta TuResto con el agente de impresión local (vinculado por código de 6 dígitos) para imprimir comandas y tickets sin diálogo de Windows.",
+  "background": { "service_worker": "background.js" },
+  "host_permissions": [
+    "http://127.0.0.1:47823/*",
+    "http://localhost:47823/*",
+    "http://localhost/*",
+    "https://turesto.pro/*",
+    "https://*.turesto.pro/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://turesto.pro/*",
+        "https://*.turesto.pro/*",
+        "http://localhost/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -62,8 +62,12 @@ require.cache['STORE_FALSO'] = { id:'STORE_FALSO', filename:'STORE_FALSO', loade
 
 const ok = (c, m) => { console.log(`${c ? '  OK  ' : ' FALLA'}  ${m}`); if (!c) process.exitCode = 1; };
 
-// Simular una instalación VIEJA con la clave que estaba en el código.
-const CLAVE_VIEJA = 'tr_pa_e7c1f4a9b2d6e0338f5a1c7d9b4e2f60a3c8d5e1f9b0264c';
+// Simular una instalación VIEJA, de cuando la clave estaba escrita en el
+// código. El valor de acá es inventado a propósito: la clave real que se retiró
+// NO va en este archivo — es público, y publicarla dejaría legibles los
+// almacenes de los agentes que todavía no actualizaron. Para lo que mide el
+// test (que los archivos viejos se borren) sirve cualquier clave distinta.
+const CLAVE_VIEJA = 'clave-de-ejemplo-de-una-version-anterior';
 for (const n of ['config','print-queue','audit-print','audit-pairing'])
   fs.writeFileSync(path.join(userData,`${n}.json`), JSON.stringify({ __k: CLAVE_VIEJA, pairedToken:'token-viejo-secreto' }));
 

@@ -84,12 +84,12 @@
     }
   },
   "license": "MIT",
-  "homepage": "https://github.com/MarianoDCC/turesto-print-agent",
+  "homepage": "https://github.com/MarianoDCC/POShelp",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MarianoDCC/turesto-print-agent.git"
+    "url": "https://github.com/MarianoDCC/POShelp.git"
   },
   "bugs": {
-    "url": "https://github.com/MarianoDCC/turesto-print-agent/issues"
+    "url": "https://github.com/MarianoDCC/POShelp/issues"
   }
 }

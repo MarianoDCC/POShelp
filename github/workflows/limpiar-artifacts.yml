@@ -1,0 +1,65 @@
+# Limpia los artifacts viejos de este repo.
+#
+# POR QUE EXISTE: el cupo de almacenamiento de Actions es DE LA CUENTA, no de
+# cada repo. Los instaladores que este repo guarda como artifact taparon el
+# cupo de MarianoDCC, y el que se rompe por eso es el backup de la base de
+# TuResto, que vive en otro repo: toma el dump bien y despues GitHub se niega
+# a guardarlo ("Artifact storage quota has been hit").
+#
+# Arranca sola al subir este archivo, y despues queda de portera los lunes.
+
+name: Limpiar artifacts viejos
+
+on:
+  push:
+    paths: ['.github/workflows/limpiar-artifacts.yml']
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      simulacro:
+        description: 'Solo listar lo que borraria, sin borrar'
+        type: boolean
+        default: false
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  limpiar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Borrar artifacts de mas de 7 dias
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SIMULACRO: ${{ inputs.simulacro }}
+        run: |
+          set -euo pipefail
+          CORTE=$(date -u -d "-7 days" +%s)
+
+          gh api --paginate "/repos/$REPO/actions/artifacts" \
+            --jq '.artifacts[] | select(.expired == false)
+                  | [.id, .name, .size_in_bytes, .created_at] | @tsv' > /tmp/todos.tsv
+
+          BORRADOS=0; LIBERADO=0; QUEDAN=0
+          while IFS=$'\t' read -r ID NOMBRE BYTES CREADO; do
+            [ -z "${ID:-}" ] && continue
+            MB=$((BYTES/1000000))
+            if [ "$(date -u -d "$CREADO" +%s)" -gt "$CORTE" ]; then
+              echo "  se deja (reciente)  ${MB}MB  $NOMBRE"
+              QUEDAN=$((QUEDAN+1)); continue
+            fi
+            if [ "${SIMULACRO:-false}" = "true" ]; then
+              echo "  SIMULACRO borraria  ${MB}MB  $NOMBRE  $CREADO"
+            elif gh api -X DELETE "/repos/$REPO/actions/artifacts/$ID" --silent 2>/dev/null; then
+              echo "  BORRADO             ${MB}MB  $NOMBRE  $CREADO"
+            else
+              echo "::warning::no se pudo borrar $NOMBRE ($ID)"; continue
+            fi
+            BORRADOS=$((BORRADOS+1)); LIBERADO=$((LIBERADO+BYTES))
+          done < /tmp/todos.tsv
+
+          echo "Borrados $BORRADOS ($((LIBERADO/1000000)) MB) - quedan $QUEDAN recientes" \
+            | tee -a "$GITHUB_STEP_SUMMARY"

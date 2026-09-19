@@ -54,11 +54,21 @@ jobs:
           cp "$(ls dist/*.exe | head -1)" "out/TuResto-Agente-Setup.exe"
           ls -la out
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows-installer
-          path: out/TuResto-Agente-Setup.exe
-          if-no-files-found: error
+      # NO se sube artifact, a proposito (2026-09-19).
+      #
+      # Habia un upload-artifact del instalador sin retention-days, o sea que
+      # GitHub lo guardaba 90 dias, y este workflow corre en CADA push a main.
+      # El .exe pesa 77 MB: quedaron 4 copias = 310 MB ocupados.
+      #
+      # El cupo de almacenamiento de Actions es DE LA CUENTA, no del repo, y
+      # son 500 MB en el plan personal. Lo que se rompio por eso fue el backup
+      # de la base de TuResto, que vive en otro repositorio: tomaba el dump
+      # bien y GitHub se negaba a guardarlo. Seis dias sin una sola copia de
+      # las bases de los bares por culpa de un instalador.
+      #
+      # Y era una copia que no servia para nada: el paso de abajo publica el
+      # MISMO archivo como release asset, que es de donde lo baja la gente por
+      # el link fijo. El artifact ni se podia bajar sin cuenta de GitHub.
 
       # Published on pushes to main so the latest build is always downloadable
       # at a fixed URL:

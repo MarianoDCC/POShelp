@@ -8,6 +8,16 @@ It is used by point-of-sale and restaurant software, where a waiter closing a
 table has to produce a ticket in one tap: stopping to confirm a print dialog,
 pick a printer and adjust margins on every order is not workable during service.
 
+It is the print agent of [TuResto](https://turesto.pro), a point-of-sale system
+for restaurants, bars, cafés, pizzerias, ice-cream shops and fast-food places in
+Argentina: tables, kitchen tickets by station, cash register, stock with
+recipes, ARCA e-invoicing and its own delivery storefront without commission.
+The source is public so anyone can see exactly what runs on their computer.
+
+> **En español:** es el agente de impresión de [TuResto](https://turesto.pro),
+> el sistema de punto de venta para restaurantes, bares y cafeterías de
+> Argentina. Imprime comandas y tickets sin el cuadro de impresión del navegador.
+
 ## What it does
 
 - Runs in the background and listens on `127.0.0.1` only. It never opens a port
